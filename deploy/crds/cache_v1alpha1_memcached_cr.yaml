@@ -6,3 +6,4 @@ spec:
   # Add fields here
   size: 3
   value: "update"
+  token: "HERE_YOUR_TOKEN"

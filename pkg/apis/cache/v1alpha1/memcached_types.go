@@ -13,6 +13,7 @@ type MemcachedSpec struct {
 	// Size is the size of the memcached deployment
 	Size int32 `json:"size"`
 	Value string `json:"value"`
+	Token string `json:"token"`
 }
 
 // MemcachedStatus defines the observed state of Memcached

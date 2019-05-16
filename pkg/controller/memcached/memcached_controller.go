@@ -6,6 +6,8 @@ import (
 
 	cachev1alpha1 "github.com/jcarlosv/memcached-operator/pkg/apis/cache/v1alpha1"
 
+	"github.com/bluele/slack"
+
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -24,6 +26,12 @@ import (
 )
 
 var log = logf.Log.WithName("controller_memcached")
+
+const (
+  channelName = "carlos-test-bot"
+)
+
+var token = ""
 
 /**
 * USER ACTION REQUIRED: This is a scaffold file intended for the user to modify with their own Controller
@@ -113,6 +121,9 @@ func (r *ReconcileMemcached) Reconcile(request reconcile.Request) (reconcile.Res
 		memcached.Status.Value = memcached.Spec.Value
 		memcached.Status.State = "New"
 
+		token = memcached.Spec.Token
+		sendMessage()
+
 		err := r.client.Status().Update(context.TODO(), memcached)
 		if err != nil {
 			reqLogger.Error(err, "Failed to update Memcached status")
@@ -141,6 +152,8 @@ func (r *ReconcileMemcached) Reconcile(request reconcile.Request) (reconcile.Res
 			reqLogger.Error(err, "Failed to update Memcached status")
 			return reconcile.Result{}, err
 		}
+		token = memcached.Spec.Token
+		sendMessage()
 	}
 
 	// Ensure the deployment size is the same as the spec
@@ -236,4 +249,12 @@ func getPodNames(pods []corev1.Pod) []string {
 		podNames = append(podNames, pod.Name)
 	}
 	return podNames
+}
+
+func sendMessage() {
+  api := slack.New(token)
+  err := api.ChatPostMessage(channelName, "Hello, world!", nil)
+  if err != nil {
+	  // TODO
+  }
 }
