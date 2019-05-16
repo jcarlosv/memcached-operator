@@ -109,6 +109,15 @@ func (r *ReconcileMemcached) Reconcile(request reconcile.Request) (reconcile.Res
 	found := &appsv1.Deployment{}
 	err = r.client.Get(context.TODO(), types.NamespacedName{Name: memcached.Name, Namespace: memcached.Namespace}, found)
 	if err != nil && errors.IsNotFound(err) {
+
+		memcached.Status.Value = memcached.Spec.Value
+		memcached.Status.State = "New"
+
+		err := r.client.Status().Update(context.TODO(), memcached)
+		if err != nil {
+			reqLogger.Error(err, "Failed to update Memcached status")
+			return reconcile.Result{}, err
+		}
 		// Define a new deployment
 		dep := r.deploymentForMemcached(memcached)
 		reqLogger.Info("Creating a new Deployment", "Deployment.Namespace", dep.Namespace, "Deployment.Name", dep.Name)
@@ -122,6 +131,16 @@ func (r *ReconcileMemcached) Reconcile(request reconcile.Request) (reconcile.Res
 	} else if err != nil {
 		reqLogger.Error(err, "Failed to get Deployment")
 		return reconcile.Result{}, err
+	}
+
+	if value := memcached.Spec.Value; memcached.Status.Value != value {
+		memcached.Status.Value = value
+		memcached.Status.State = "Updated"
+		err := r.client.Status().Update(context.TODO(), memcached)
+		if err != nil {
+			reqLogger.Error(err, "Failed to update Memcached status")
+			return reconcile.Result{}, err
+		}
 	}
 
 	// Ensure the deployment size is the same as the spec

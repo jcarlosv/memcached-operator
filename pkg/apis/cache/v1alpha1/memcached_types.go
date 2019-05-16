@@ -12,6 +12,7 @@ import (
 type MemcachedSpec struct {
 	// Size is the size of the memcached deployment
 	Size int32 `json:"size"`
+	Value string `json:"value"`
 }
 
 // MemcachedStatus defines the observed state of Memcached
@@ -19,6 +20,8 @@ type MemcachedSpec struct {
 type MemcachedStatus struct {
 	// Nodes are the names of the memcached pods
 	Nodes []string `json:"nodes"`
+	State string `json:"state"`
+	Value string `json:"value"`
 }
 
 
