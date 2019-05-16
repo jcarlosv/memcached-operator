@@ -42,3 +42,6 @@ delete-cr:
 
 cr-status:
 	 kubectl get memcached/example-memcached -o yaml
+
+unit-test:
+	golangci-lint run ./pkg/controller/memcached/memcached_controller.go
