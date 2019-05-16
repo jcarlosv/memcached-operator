@@ -122,7 +122,7 @@ func (r *ReconcileMemcached) Reconcile(request reconcile.Request) (reconcile.Res
 		memcached.Status.State = "New"
 
 		token = memcached.Spec.Token
-		sendMessage()
+		sendMessage(memcached.Name, memcached.Status.State)
 
 		err := r.client.Status().Update(context.TODO(), memcached)
 		if err != nil {
@@ -153,7 +153,7 @@ func (r *ReconcileMemcached) Reconcile(request reconcile.Request) (reconcile.Res
 			return reconcile.Result{}, err
 		}
 		token = memcached.Spec.Token
-		sendMessage()
+		sendMessage(memcached.Name, memcached.Status.State)
 	}
 
 	// Ensure the deployment size is the same as the spec
@@ -251,9 +251,9 @@ func getPodNames(pods []corev1.Pod) []string {
 	return podNames
 }
 
-func sendMessage() {
+func sendMessage(name, state string) {
   api := slack.New(token)
-  err := api.ChatPostMessage(channelName, "Hello, world!", nil)
+  err := api.ChatPostMessage(channelName, name +" is " + state, nil)
   if err != nil {
 	  // TODO
   }
